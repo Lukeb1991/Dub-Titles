@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dub Titles - Famous movies, lost in translation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .film-strip {
+            position: absolute;
+            top: 0;
+            left: -50px;
+            width: 100px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                #333 0px,
+                #333 20px,
+                transparent 20px,
+                transparent 40px
+            );
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 1;
+            position: relative;
+        }
+
+        .game-title {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 3px 3px 0px #b8860b;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 3px 3px 0px #b8860b, 0 0 20px #ffd700; }
+            to { text-shadow: 3px 3px 0px #b8860b, 0 0 30px #ffd700; }
+        }
+
+        .game-tagline {
+            font-size: 1.2rem;
+            color: #ccc;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .game-description {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #e0e0e0;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .game-description p {
+            margin-bottom: 8px;
+        }
+
+        .lives-counter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .life {
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .foreign-title {
+            font-size: 2.5rem;
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hint-emojis {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .hint-emojis.show {
+            opacity: 1;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .movie-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .movie-input:focus {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transform: scale(1.02);
+        }
+
+        .movie-input::placeholder {
+            color: #ccc;
+        }
+
+        .flag-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .flag-button {
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flag-button:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .flag-button.selected {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(45deg, #ffed4e, #ffd700);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.correct {
+            background: rgba(0, 255, 0, 0.2);
+            color: #90EE90;
+        }
+
+        .feedback.incorrect {
+            background: rgba(255, 0, 0, 0.2);
+            color: #FFB6C1;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .next-btn.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .next-btn:hover {
+            background: linear-gradient(45deg, #66BB6A, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 20px;
+            margin-top: 30px;
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            color: #FFB6C1;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: linear-gradient(45deg, #FF8E8E, #FF6B6B);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .foreign-title {
+                font-size: 2rem;
+            }
+            
+            .hint-emojis {
+                font-size: 2.5rem;
+            }
+            
+            .flag-options {
+                grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="film-strip"></div>
+        
+        <div class="game-header">
+            <h1 class="game-title">DUB TITLES</h1>
+            <p class="game-tagline">Famous movies, lost in translation</p>
+            <div class="game-description">
+                <p>In Lost in Translation, we give you the foreign title of a well-known film... Your job?</p>
+                <p>🎬 Tell me its original English name.</p>
+                <p>🌍 As a bonus, tell me the country of the translation.</p>
+            </div>
+        </div>
+
+        <div class="lives-counter">
+            <span>Lives: </span>
+            <div id="lives-display">❤️❤️❤️</div>
+        </div>
+
+        <div class="score">
+            Score: <span id="score">0</span>
+        </div>
+
+        <div class="game-card" id="game-card">
+            <div class="foreign-title" id="foreign-title">Mamma, ho perso l'aereo</div>
+            <div class="hint-emojis" id="hint-emojis">🏠✈️</div>
+            
+            <div class="input-group">
+                <label class="input-label" for="movie-guess">Enter the English movie title:</label>
+                <input type="text" id="movie-guess" class="movie-input" placeholder="Type your guess here...">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Select the country/language:</label>
+                <div class="flag-options" id="flag-options">
+                    <button class="flag-button" data-country="italy">🇮🇹</button>
+                    <button class="flag-button" data-country="france">🇫🇷</button>
+                    <button class="flag-button" data-country="germany">🇩🇪</button>
+                    <button class="flag-button" data-country="spain">🇪🇸</button>
+                    <button class="flag-button" data-country="romania">🇷🇴</button>
+                    <button class="flag-button" data-country="portugal">🇵🇹</button>
+                    <button class="flag-button" data-country="norway">🇳🇴</button>
+                    <button class="flag-button" data-country="sweden">🇸🇪</button>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submit-btn">Submit Guess</button>
+            <button class="next-btn" id="next-btn">Next Movie</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="game-over" id="game-over" style="display: none;">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <div id="answer-reveal" style="margin: 20px 0; padding: 20px; background: rgba(255, 215, 0, 0.1); border-radius: 10px; border: 1px solid rgba(255, 215, 0, 0.3);">
+                <p style="color: #ffd700; font-weight: bold; margin-bottom: 10px;">The answer was:</p>
+                <p id="correct-answer" style="font-size: 1.2rem; color: #fff;"></p>
+            </div>
+            <button class="restart-btn" id="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const movies = [
+            {
+                foreign: "Mamma, ho perso l'aereo",
+                english: "home alone",
+                country: "italy",
+                hints: ["🏠", "✈️"]
+            },
+            {
+                foreign: "La guerre des étoiles",
+                english: "star wars",
+                country: "france",
+                hints: ["⭐", "⚔️"]
+            },
+            {
+                foreign: "Der weiße Hai",
+                english: "jaws",
+                country: "germany",
+                hints: ["🦈", "🌊"]
+            },
+            {
+                foreign: "El club de la pelea",
+                english: "fight club",
+                country: "spain",
+                hints: ["👊", "🥊"]
+            },
+            {
+                foreign: "Clubul de luptă",
+                english: "fight club",
+                country: "romania",
+                hints: ["👊", "🥊"]
+            },
+            {
+                foreign: "O Rei Leão",
+                english: "the lion king",
+                country: "portugal",
+                hints: ["🦁", "👑"]
+            },
+            {
+                foreign: "Tilbake til fremtiden",
+                english: "back to the future",
+                country: "norway",
+                hints: ["🚗", "⚡"]
+            },
+            {
+                foreign: "Tillbaka till framtiden",
+                english: "back to the future",
+                country: "sweden",
+                hints: ["🚗", "⚡"]
+            },
+            {
+                foreign: "Le roi lion",
+                english: "the lion king",
+                country: "france",
+                hints: ["🦁", "👑"]
+            },
+            {
+                foreign: "Findet Nemo",
+                english: "finding nemo",
+                country: "germany",
+                hints: ["🐠", "🔍"]
+            }
+        ];
+
+        const correctQuips = [
+            "You deserve an Oscar for that one!",
+            "That's a wrap—on your brilliance!",
+            "Roll credits, you're the star!",
+            "You nailed it like a dramatic monologue.",
+            "Lights, camera, nailed it!",
+            "Even Scorsese's impressed.",
+            "You understood the assignment... and the translation.",
+            "Fluent in film — we see you!",
+            "Boom. Box office brain.",
+            "That answer? Certified Fresh. 🍅"
+        ];
+
+        const wrongQuips = [
+            "Cut! Let's try that scene again.",
+            "More flop than blockbuster.",
+            "Even Nicolas Cage is disappointed.",
+            "The subtitles were off... and so were you.",
+            "That guess? Straight to DVD.",
+            "Don't worry, even IMDb wouldn't have known.",
+            "You missed the plot twist.",
+            "Fade to black. Try again?",
+            "Guess again... before the sequel drops.",
+            "You're gonna need a montage to recover. 🎬"
+        ];
+
+        let currentMovieIndex = 0;
+        let lives = 3;
+        let score = 0;
+        let selectedCountry = null;
+        let hintsShown = 0;
+        let gameOver = false;
+
+        const elements = {
+            foreignTitle: document.getElementById('foreign-title'),
+            hintEmojis: document.getElementById('hint-emojis'),
+            movieGuess: document.getElementById('movie-guess'),
+            flagOptions: document.getElementById('flag-options'),
+            submitBtn: document.getElementById('submit-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            feedback: document.getElementById('feedback'),
+            livesDisplay: document.getElementById('lives-display'),
+            scoreDisplay: document.getElementById('score'),
+            gameCard: document.getElementById('game-card'),
+            gameOverDiv: document.getElementById('game-over'),
+            finalScore: document.getElementById('final-score'),
+            restartBtn: document.getElementById('restart-btn')
+        };
+
+        function initializeGame() {
+            currentMovieIndex = 0;
+            lives = 3;
+            score = 0;
+            gameOver = false;
+            hintsShown = 0;
+            selectedCountry = null;
+            
+            elements.gameCard.style.display = 'block';
+            elements.gameOverDiv.style.display = 'none';
+            elements.nextBtn.classList.remove('show');
+            elements.feedback.classList.remove('show');
+            elements.hintEmojis.classList.remove('show');
+            
+            updateDisplay();
+            loadCurrentMovie();
+        }
+
+        function updateDisplay() {
+            elements.livesDisplay.textContent = '❤️'.repeat(lives);
+            elements.scoreDisplay.textContent = score;
+        }
+
+        function loadCurrentMovie() {
+            if (currentMovieIndex >= movies.length) {
+                // Game completed successfully
+                showGameComplete();
+                return;
+            }
+
+            const movie = movies[currentMovieIndex];
+            elements.foreignTitle.textContent = movie.foreign;
+            elements.hintEmojis.textContent = '';
+            elements.movieGuess.value = '';
+            selectedCountry = null;
+            hintsShown = 0;
+            
+            // Clear flag selection
+            document.querySelectorAll('.flag-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            elements.hintEmojis.classList.remove('show');
+            elements.feedback.classList.remove('show');
+            elements.nextBtn.classList.remove('show');
+            elements.submitBtn.disabled = false;
+        }
+
+        function showHint() {
+            const movie = movies[currentMovieIndex];
+            if (hintsShown < movie.hints.length) {
+                const currentHints = movie.hints.slice(0, hintsShown + 1);
+                elements.hintEmojis.textContent = currentHints.join(' ');
+                elements.hintEmojis.classList.add('show');
+                hintsShown++;
+            }
+        }
+
+        function checkAnswer() {
+            const movie = movies[currentMovieIndex];
+            const userGuess = elements.movieGuess.value.trim().toLowerCase();
+            const correctTitle = movie.english.toLowerCase();
+            
+            let titleCorrect = false;
+            let countryCorrect = selectedCountry === movie.country;
+            
+            // Check if the guess matches the title (allowing for slight variations)
+            if (userGuess === correctTitle || 
+                userGuess.includes(correctTitle) || 
+                correctTitle.includes(userGuess)) {
+                titleCorrect = true;
+            }
+            
+            if (titleCorrect && countryCorrect) {
+                // Both correct
+                score += 10;
+                showFeedback(true, getRandomQuip(correctQuips));
+                elements.nextBtn.classList.add('show');
+                elements.submitBtn.disabled = true;
+            } else if (titleCorrect) {
+                // Title correct, country wrong
+                score += 5;
+                showFeedback(true, `Great! You got the movie right! The country was ${movie.country.charAt(0).toUpperCase() + movie.country.slice(1)} though.`);
+                elements.nextBtn.classList.add('show');
+                elements.submitBtn.disabled = true;
+            } else {
+                // Title wrong
+                lives--;
+                if (lives > 0) {
+                    showHint();
+                    showFeedback(false, getRandomQuip(wrongQuips));
+                    // Clear inputs for another guess but keep submit button enabled
+                    elements.movieGuess.value = '';
+                    selectedCountry = null;
+                    document.querySelectorAll('.flag-button').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    // Don't disable submit button - let them try again
+                } else {
+                    showGameOver();
+                }
+            }
+            
+            updateDisplay();
+        }
+
+        function showFeedback(isCorrect, message) {
+            elements.feedback.textContent = message;
+            elements.feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'} show`;
+        }
+
+        function showGameOver() {
+            gameOver = true;
+            const movie = movies[currentMovieIndex];
+            elements.gameCard.style.display = 'none';
+            elements.gameOverDiv.style.display = 'block';
+            elements.finalScore.textContent = `Final Score: ${score} points`;
+            
+            // Show the correct answer
+            const correctAnswer = document.getElementById('correct-answer');
+            correctAnswer.textContent = `"${movie.english.toUpperCase()}" from ${movie.country.charAt(0).toUpperCase() + movie.country.slice(1)}`;
+        }
+
+        function showGameComplete() {
+            elements.gameCard.style.display = 'none';
+            elements.gameOverDiv.style.display = 'block';
+            elements.gameOverDiv.querySelector('h2').textContent = 'Congratulations!';
+            elements.finalScore.textContent = `You completed all movies! Final Score: ${score} points`;
+        }
+
+        function getRandomQuip(quips) {
+            return quips[Math.floor(Math.random() * quips.length)];
+        }
+
+        function nextMovie() {
+            currentMovieIndex++;
+            loadCurrentMovie();
+        }
+
+        // Event listeners
+        elements.flagOptions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('flag-button')) {
+                document.querySelectorAll('.flag-button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+                selectedCountry = e.target.dataset.country;
+            }
+        });
+
+        elements.submitBtn.addEventListener('click', () => {
+            if (elements.movieGuess.value.trim() && selectedCountry) {
+                checkAnswer();
+            } else {
+                alert('Please enter a movie title and select a country!');
+            }
+        });
+
+        elements.nextBtn.addEventListener('click', nextMovie);
+
+        elements.restartBtn.addEventListener('click', initializeGame);
+
+        elements.movieGuess.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && elements.movieGuess.value.trim() && selectedCountry) {
+                checkAnswer();
+            }
+        });
+
+        // Initialize the game
+        initializeGame();
+    </script>
+</body>
+</html>
