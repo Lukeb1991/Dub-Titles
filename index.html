@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dub Titles – the daily film puzzle</title>
-<meta name="description" content="Five famous films, renamed abroad. Can you work out the originals? A new puzzle every day from Puzzl Lab.">
+<meta name="description" content="Three famous films, renamed abroad. Can you work out the originals? A new puzzle every day from Puzzl Lab.">
 <meta name="theme-color" content="#0b0e1c">
 <!-- Link previews (WhatsApp, iMessage, socials). Swap the domain for your live address. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Puzzl Lab">
 <meta property="og:title" content="Dub Titles – the daily film puzzle">
-<meta property="og:description" content="Five famous films, renamed abroad. Can you work out the originals?">
-<meta property="og:url" content="https://dubtitles.co.uk/">
-<meta property="og:image" content="https://dubtitles.co.uk/og-image.png">
+<meta property="og:description" content="Three famous films, renamed abroad. Can you work out the originals?">
+<meta property="og:url" content="https://lukeb1991.github.io/Dub-Titles/">
+<meta property="og:image" content="https://lukeb1991.github.io/Dub-Titles/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -334,8 +334,7 @@ dialog p strong{color:var(--text)}
   <p>Every day there are <strong>three famous films</strong>, shown under the title they were given in another country. Name the <strong>original English title</strong> for 5 points.</p>
   <p>Get it right and pick the country that used that title for <strong>5 bonus points</strong>.</p>
   <p>You've got three tickets for the whole day. Each wrong guess tears one up and reveals an emoji clue. Lose all three and it's curtains.</p>
-  <p>Same three films for everyone. New puzzle at midnight UK time.</p>
-  <div class="key"><span><i class="cell film">+5</i> Film named</span><span><i class="cell bonus">+5</i> Bonus country</span><span><i class="cell miss">✗</i> Missed</span></div>
+<p>Same three films for everyone. New puzzle at 7am UK time.</p>  <div class="key"><span><i class="cell film">+5</i> Film named</span><span><i class="cell bonus">+5</i> Bonus country</span><span><i class="cell miss">✗</i> Missed</span></div>
   <button class="btn btn-primary btn-block" id="help-close">Let's play</button>
 </dialog>
 
@@ -356,8 +355,9 @@ dialog p strong{color:var(--text)}
 
 <script>
 /* ================= Settings ================= */
-const SITE_URL = 'https://dubtitles.co.uk';   // ← your live address (used in the share text)
-const LAUNCH   = '2026-10-04';                // ← date of puzzle #1 (UK time)
+const SITE_URL = 'https://lukeb1991.github.io/Dub-Titles/';   // ← your live address (used in the share text)
+const RESET_HOUR = 7;                         // ← new puzzle each day at this hour, UK time
+const LAUNCH   = '2026-10-05';                // ← date of puzzle #1 (UK time)
 const PER_DAY = 3, START_LIVES = 3;
 
 const COUNTRIES = {
@@ -487,7 +487,7 @@ const pick = a => a[Math.floor(Math.random()*a.length)];
 function londonNow(){
   const o={};
   new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',year:'numeric',month:'2-digit',day:'2-digit',
-    hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).forEach(p=>o[p.type]=p.value);
+    hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(Date.now()-RESET_HOUR*3600e3)).forEach(p=>o[p.type]=p.value);
   return o;
 }
 function dayNumber(){
